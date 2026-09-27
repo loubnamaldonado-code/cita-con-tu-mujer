@@ -583,7 +583,7 @@ async function submitQuestionnaire(){
 
   answers.tuesday = selected.length ? selected : ['No se ha seleccionado ningún plan'];
 
-  const endpoint = 'https://script.google.com/macros/s/AKfycbxNrtmPVVIPPVn_ej0KTtLKtb2zVZzKtyFUZynnFsHbbw89hPPEh0Bs2gSpBpT-O_l6/exec';
+  const endpoint = 'PEGA_AQUI_LA_URL_DE_TU_WEB_APP';
 
   if (endpoint.includes('PEGA_AQUI')) {
     alert('Falta conectar el formulario con el enlace de recepción de respuestas.');
@@ -605,12 +605,17 @@ async function submitQuestionnaire(){
     });
 
     document.getElementById('summary').innerHTML =
-    '<strong>Lunes por la noche</strong><br>' +
-    escapeHtml(answers.monday) +
-    '<br><br><strong>Martes</strong><br>' +
-    answers.tuesday.map(escapeHtml).join('<br>');
+      '<strong>Lunes por la noche</strong><br>' +
+      escapeHtml(answers.monday) +
+      '<br><br><strong>Martes</strong><br>' +
+      answers.tuesday.map(escapeHtml).join('<br>');
 
-  showScreen('screen-success');
+    showScreen('screen-success');
+
+  } catch (error) {
+    alert('No se ha podido enviar la respuesta. Comprueba la conexión con Google Apps Script.');
+    console.error(error);
+  }
 }
 
 function escapeHtml(text){
