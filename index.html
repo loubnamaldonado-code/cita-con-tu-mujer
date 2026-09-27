@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario: Cita con tu Mujer</title>
+<style>
+  :root{
+    --cream:#f8f0df;
+    --cream-dark:#eee1c9;
+    --brown:#6f5846;
+    --brown-dark:#554132;
+    --rose:#c99788;
+    --white:#fffaf1;
+    --shadow:0 18px 45px rgba(91,68,48,.12);
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    background:var(--cream);
+    color:var(--brown-dark);
+    overflow-x:hidden;
+  }
+
+  .hearts{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+    opacity:.24;
+  }
+
+  .heart{
+    position:absolute;
+    color:var(--rose);
+    font-size:18px;
+    animation:float 9s ease-in-out infinite;
+  }
+
+  .heart:nth-child(1){left:8%;top:12%;font-size:16px}
+  .heart:nth-child(2){left:88%;top:17%;font-size:22px;animation-delay:1s}
+  .heart:nth-child(3){left:18%;top:72%;font-size:13px;animation-delay:2s}
+  .heart:nth-child(4){left:78%;top:78%;font-size:17px;animation-delay:3s}
+  .heart:nth-child(5){left:48%;top:9%;font-size:12px;animation-delay:4s}
+  .heart:nth-child(6){left:93%;top:53%;font-size:14px;animation-delay:2.5s}
+  .heart:nth-child(7){left:5%;top:45%;font-size:11px;animation-delay:1.5s}
+  .heart:nth-child(8){left:61%;top:91%;font-size:15px;animation-delay:4.5s}
+
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(-4deg)}
+    50%{transform:translateY(-10px) rotate(5deg)}
+  }
+
+  .app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:25px;
+  }
+
+  .screen{
+    width:min(680px,100%);
+    min-height:650px;
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    padding:55px 42px;
+    background:rgba(255,250,241,.76);
+    border:1px solid rgba(111,88,70,.10);
+    border-radius:28px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(4px);
+    animation:fadeIn .55s ease;
+  }
+
+  .screen.active{display:flex}
+
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(14px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  .cover{
+    text-align:center;
+    align-items:center;
+  }
+
+  .small-heart{
+    color:var(--rose);
+    font-size:28px;
+    margin-bottom:18px;
+  }
+
+  h1{
+    font-size:clamp(34px,7vw,54px);
+    line-height:1.08;
+    font-weight:normal;
+    margin:0 0 18px;
+    letter-spacing:-1px;
+  }
+
+  h2{
+    font-size:32px;
+    font-weight:normal;
+    margin:0 0 15px;
+  }
+
+  h3{
+    font-size:21px;
+    font-weight:normal;
+    margin:30px 0 14px;
+  }
+
+  p{
+    font-size:18px;
+    line-height:1.65;
+    margin:0 0 18px;
+  }
+
+  .subtitle{
+    font-size:18px;
+    opacity:.78;
+    margin-bottom:38px;
+  }
+
+  .button{
+    border:0;
+    border-radius:999px;
+    padding:15px 34px;
+    font-family:inherit;
+    font-size:17px;
+    cursor:pointer;
+    background:var(--brown);
+    color:white;
+    transition:.2s ease;
+    box-shadow:0 8px 20px rgba(111,88,70,.18);
+  }
+
+  .button:hover{
+    background:var(--brown-dark);
+    transform:translateY(-2px);
+  }
+
+  .button.secondary{
+    background:transparent;
+    color:var(--brown);
+    border:1px solid rgba(111,88,70,.25);
+    box-shadow:none;
+  }
+
+  .button-row{
+    margin-top:35px;
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+  }
+
+  .instructions{
+    padding-left:22px;
+    margin:22px 0 0;
+  }
+
+  .instructions li{
+    font-size:17px;
+    line-height:1.65;
+    margin:10px 0;
+  }
+
+  .question{
+    margin-top:28px;
+  }
+
+  .option{
+    display:block;
+    position:relative;
+    margin:11px 0;
+  }
+
+  .option input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .option label{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:16px 18px;
+    border:1px solid rgba(111,88,70,.18);
+    border-radius:16px;
+    background:rgba(255,255,255,.34);
+    cursor:pointer;
+    font-size:17px;
+    transition:.2s ease;
+  }
+
+  .option label:hover{
+    border-color:rgba(111,88,70,.35);
+    transform:translateX(2px);
+  }
+
+  .option input:checked + label{
+    background:#f0e1d2;
+    border-color:var(--rose);
+    box-shadow:0 5px 16px rgba(111,88,70,.08);
+  }
+
+  .check{
+    width:20px;
+    height:20px;
+    border:1px solid rgba(111,88,70,.35);
+    border-radius:50%;
+    flex:none;
+  }
+
+  input[type="checkbox"] + label .check{
+    border-radius:6px;
+  }
+
+  .option input:checked + label .check{
+    background:var(--brown);
+    border-color:var(--brown);
+    box-shadow:inset 0 0 0 4px #f0e1d2;
+  }
+
+  .conditional{
+    display:none;
+    margin:15px 0 8px 18px;
+    padding-left:17px;
+    border-left:2px solid rgba(201,151,136,.45);
+    animation:fadeIn .35s ease;
+  }
+
+  .conditional.visible{display:block}
+
+  .conditional-title{
+    font-size:16px;
+    margin:0 0 12px;
+    opacity:.82;
+  }
+
+  .text-input{
+    width:100%;
+    border:1px solid rgba(111,88,70,.22);
+    border-radius:14px;
+    padding:14px 16px;
+    font-family:inherit;
+    font-size:16px;
+    background:rgba(255,255,255,.45);
+    color:var(--brown-dark);
+    outline:none;
+  }
+
+  .text-input:focus{
+    border-color:var(--rose);
+  }
+
+  .note{
+    font-size:14px;
+    opacity:.65;
+    margin-top:8px;
+  }
+
+  .error{
+    display:none;
+    color:#a55757;
+    font-size:15px;
+    margin-top:14px;
+  }
+
+  .error.visible{display:block}
+
+  .success{
+    text-align:center;
+    align-items:center;
+  }
+
+  .success-icon{
+    font-size:45px;
+    color:var(--rose);
+    margin-bottom:20px;
+  }
+
+  .summary{
+    width:100%;
+    margin:22px 0;
+    padding:20px;
+    background:rgba(255,255,255,.38);
+    border-radius:16px;
+    text-align:left;
+    line-height:1.7;
+  }
+
+  .summary strong{color:var(--brown)}
+
+  @media(max-width:600px){
+    .app{padding:12px}
+    .screen{
+      min-height:calc(100vh - 24px);
+      border-radius:22px;
+      padding:38px 24px;
+    }
+    .button-row{justify-content:stretch}
+    .button{width:100%}
+  }
+</style>
+</head>
+
+<body>
+<div class="hearts" aria-hidden="true">
+  <span class="heart">♡</span><span class="heart">♡</span>
+  <span class="heart">♡</span><span class="heart">♡</span>
+  <span class="heart">♡</span><span class="heart">♡</span>
+  <span class="heart">♡</span><span class="heart">♡</span>
+</div>
+
+<main class="app">
+
+  <!-- PORTADA -->
+  <section class="screen active cover" id="screen-cover">
+    <div class="small-heart">♡</div>
+    <h1>Cuestionario:<br>Cita con tu Mujer</h1>
+    <p class="subtitle">Vamos a decidir qué hacemos estos dos días.</p>
+    <button class="button" onclick="showScreen('screen-instructions')">Comenzar</button>
+  </section>
+
+  <!-- INSTRUCCIONES -->
+  <section class="screen" id="screen-instructions">
+    <h2>Antes de empezar...</h2>
+    <p>Este pequeño cuestionario sirve para decidir nuestros planes del lunes por la noche y del martes.</p>
+    <ul class="instructions">
+      <li><strong>Lunes por la noche:</strong> se elige una única opción y, dependiendo de la respuesta, aparecerán nuevas opciones.</li>
+      <li><strong>Martes:</strong> puedes elegir todos los planes que te apetezcan. No hay límite.</li>
+      <li>Si para el martes tienes alguna idea diferente, puedes escribirla en <strong>«Otra opción»</strong>.</li>
+      <li>Al terminar, pulsa <strong>«Enviar»</strong>.</li>
+    </ul>
+    <div class="button-row">
+      <button class="button" onclick="showScreen('screen-monday')">Continuar</button>
+    </div>
+  </section>
+
+  <!-- LUNES -->
+  <section class="screen" id="screen-monday">
+    <h2>Lunes por la noche</h2>
+    <p>Primero decidimos si nos quedamos tranquilamente en casa o salimos.</p>
+
+    <div class="question">
+      <h3>¿Qué hacemos?</h3>
+
+      <div class="option">
+        <input type="radio" name="monday_main" id="home" value="Quedarse en casa" onchange="updateMonday()">
+        <label for="home"><span class="check"></span>🏠 Quedarse en casa</label>
+      </div>
+
+      <div class="option">
+        <input type="radio" name="monday_main" id="outside" value="Salir fuera" onchange="updateMonday()">
+        <label for="outside"><span class="check"></span>🌙 Salir fuera</label>
+      </div>
+    </div>
+
+    <div class="conditional" id="outside-options">
+      <p class="conditional-title">Si salimos, ¿qué plan hacemos?</p>
+
+      <div class="option">
+        <input type="radio" name="monday_plan" id="cinema" value="Cine: La bola negra + tomar algo" onchange="updateCinema()">
+        <label for="cinema"><span class="check"></span>🎬 Ir al cine a ver <em>La bola negra</em> y tomar algo para comentar la peli</label>
+      </div>
+
+      <div class="option">
+        <input type="radio" name="monday_plan" id="other-plan" value="Otro plan" onchange="updateCinema()">
+        <label for="other-plan"><span class="check"></span>🍷 Hacer otro plan</label>
+      </div>
+
+      <div class="conditional" id="other-plan-options">
+        <p class="conditional-title">¿Qué tipo de otro plan?</p>
+
+        <div class="option">
+          <input type="radio" name="other_plan_detail" id="neighborhood" value="Quedarse por el barrio">
+          <label for="neighborhood"><span class="check"></span>🍻 Quedarse por el barrio</label>
+        </div>
+
+        <div class="option">
+          <input type="radio" name="other_plan_detail" id="just-drink" value="Solo tomar algo">
+          <label for="just-drink"><span class="check"></span>🥂 Solo tomar algo</label>
+        </div>
+      </div>
+
+      <div class="conditional" id="cinema-options">
+        <p class="conditional-title">¿A qué cine?</p>
+
+        <div class="option">
+          <input type="radio" name="cinema_detail" id="babel" value="Cines Babel (ver a Juli si está)">
+          <label for="babel"><span class="check"></span>🎥 Cines Babel — ver a Juli si está</label>
+        </div>
+
+        <div class="option">
+          <input type="radio" name="cinema_detail" id="other-cinema" value="Otro cine">
+          <label for="other-cinema"><span class="check"></span>🎥 Otro cine</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="error" id="monday-error">Elige una opción para el lunes antes de continuar.</div>
+
+    <div class="button-row">
+      <button class="button" onclick="goToTuesday()">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- MARTES -->
+  <section class="screen" id="screen-tuesday">
+    <h2>Martes ☀️</h2>
+    <p>Ahora puedes elegir todos los planes que quieras. No hay máximo.</p>
+
+    <div class="question">
+      <h3>¿Qué hacemos?</h3>
+
+      <div class="option">
+        <input type="checkbox" id="lunch" value="Almuerzo">
+        <label for="lunch"><span class="check"></span>🍽️ Almuerzo</label>
+      </div>
+
+      <div class="option">
+        <input type="checkbox" id="museum" value="Museo">
+        <label for="museum"><span class="check"></span>🖼️ Museo</label>
+      </div>
+
+      <div class="option">
+        <input type="checkbox" id="beach" value="Playa">
+        <label for="beach"><span class="check"></span>🏖️ Playa</label>
+      </div>
+
+      <div class="option">
+        <input type="checkbox" id="picnic" value="Picnic">
+        <label for="picnic"><span class="check"></span>🧺 Picnic</label>
+      </div>
+
+      <div class="option">
+        <input type="checkbox" id="shops" value="Tiendas">
+        <label for="shops"><span class="check"></span>🛍️ Tiendas</label>
+      </div>
+
+      <div class="option">
+        <input type="checkbox" id="market" value="Mercadillo">
+        <label for="market"><span class="check"></span>🧺 Mercadillo</label>
+      </div>
+
+      <div class="option">
+        <input type="checkbox" id="other-tuesday" onchange="toggleOtherTuesday()">
+        <label for="other-tuesday"><span class="check"></span>✨ Otra opción</label>
+      </div>
+
+      <div class="conditional" id="other-tuesday-box">
+        <p class="conditional-title">¿Qué otro plan se te ocurre?</p>
+        <input class="text-input" id="other-tuesday-text" type="text" placeholder="Escribe aquí tu idea...">
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button class="button" onclick="submitQuestionnaire()">Enviar</button>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section class="screen success" id="screen-success">
+    <div class="success-icon">♡</div>
+    <h2>¡Enviado!</h2>
+    <p>Ya tenemos tu propuesta de planes.</p>
+    <div class="summary" id="summary"></div>
+    <button class="button secondary" onclick="restart()">Volver a empezar</button>
+  </section>
+
+</main>
+
+<script>
+let answers = {};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateMonday(){
+  const outside = document.getElementById('outside').checked;
+  const box = document.getElementById('outside-options');
+  box.classList.toggle('visible', outside);
+
+  if(!outside){
+    document.getElementById('cinema').checked = false;
+    document.getElementById('other-plan').checked = false;
+    document.getElementById('cinema-options').classList.remove('visible');
+    document.getElementById('other-plan-options').classList.remove('visible');
+    document.querySelectorAll('input[name="other_plan_detail"], input[name="cinema_detail"]').forEach(i => i.checked=false);
+  }
+}
+
+function updateCinema(){
+  const cinema = document.getElementById('cinema').checked;
+  const other = document.getElementById('other-plan').checked;
+
+  document.getElementById('cinema-options').classList.toggle('visible', cinema);
+  document.getElementById('other-plan-options').classList.toggle('visible', other);
+
+  if(!cinema){
+    document.querySelectorAll('input[name="cinema_detail"]').forEach(i => i.checked=false);
+  }
+  if(!other){
+    document.querySelectorAll('input[name="other_plan_detail"]').forEach(i => i.checked=false);
+  }
+}
+
+function goToTuesday(){
+  const main = document.querySelector('input[name="monday_main"]:checked');
+  const error = document.getElementById('monday-error');
+
+  if(!main){
+    error.classList.add('visible');
+    return;
+  }
+  error.classList.remove('visible');
+
+  let detail = main.value;
+
+  if(main.value === 'Salir fuera'){
+    const plan = document.querySelector('input[name="monday_plan"]:checked');
+    if(!plan){
+      error.textContent = 'Si eliges salir, selecciona también qué plan hacemos.';
+      error.classList.add('visible');
+      return;
+    }
+    detail = plan.value;
+
+    if(plan.value === 'Cine: La bola negra + tomar algo'){
+      const cinema = document.querySelector('input[name="cinema_detail"]:checked');
+      if(!cinema){
+        error.textContent = 'Elige a qué cine vamos.';
+        error.classList.add('visible');
+        return;
+      }
+      detail += ' → ' + cinema.value;
+    }
+
+    if(plan.value === 'Otro plan'){
+      const other = document.querySelector('input[name="other_plan_detail"]:checked');
+      if(!other){
+        error.textContent = 'Elige qué tipo de otro plan hacemos.';
+        error.classList.add('visible');
+        return;
+      }
+      detail += ' → ' + other.value;
+    }
+  }
+
+  answers.monday = detail;
+  showScreen('screen-tuesday');
+}
+
+function toggleOtherTuesday(){
+  const checked = document.getElementById('other-tuesday').checked;
+  document.getElementById('other-tuesday-box').classList.toggle('visible', checked);
+  if(!checked) document.getElementById('other-tuesday-text').value='';
+}
+
+async function submitQuestionnaire(){
+  const ids = ['lunch','museum','beach','picnic','shops','market'];
+  let selected = ids.filter(id => document.getElementById(id).checked)
+                    .map(id => document.getElementById(id).value);
+
+  if(document.getElementById('other-tuesday').checked){
+    const text = document.getElementById('other-tuesday-text').value.trim();
+    if(text) selected.push('Otra opción: ' + text);
+  }
+
+  answers.tuesday = selected.length ? selected : ['No se ha seleccionado ningún plan'];
+
+  const endpoint = 'https://script.google.com/macros/s/AKfycbw--WrQSRuCl365QXBEhhzyAvPAPy2vh3j8teRLxRRRM_eDHJS28B_iUZBlpZFDXCjTYw/exec';
+
+  if (endpoint.includes('PEGA_AQUI')) {
+    alert('Falta conectar el formulario con el enlace de recepción de respuestas.');
+    return;
+  }
+
+  const payload = {
+    monday: answers.monday,
+    tuesday: answers.tuesday,
+    email: 'loubna.maldonado@gmail.com'
+  };
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+
+    document.getElementById('summary').innerHTML =
+      '<strong>Lunes por la noche</strong><br>' +
+      escapeHtml(answers.monday) +
+      '<br><br><strong>Martes</strong><br>' +
+      answers.tuesday.map(escapeHtml).join('<br>');
+
+    showScreen('screen-success');
+
+  } catch (error) {
+    alert('No se ha podido enviar la respuesta. Comprueba la conexión con Google Apps Script.');
+    console.error(error);
+  }
+}
+
+function escapeHtml(text){
+  return text.replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[c]));
+}
+
+function restart(){
+  location.reload();
+}
+</script>
+</body>
+</html>
